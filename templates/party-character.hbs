@@ -210,17 +210,43 @@
                 </ul>
             </div>
 
-            <!-- Inventory Tab -->
-            <div class="tab-content inventory" data-tab="inventory" style="display: none;">
-                <h2>Inventory</h2>
-                <ul class="inventory-list">
-                    {{#each inventory}}
-                    <li><strong>{{this.name}}</strong> (Quantity: {{this.quantity}})</li>
-                    {{else}}
-                    <li>No items in inventory.</li>
-                    {{/each}}
-                </ul>
-            </div>
+<!-- Debug partyInventory -->
+{{log "partyInventory data:" partyInventory}}
+
+<!-- Inventory Tab -->
+<div class="tab-content inventory" data-tab="inventory" style="display: none;">
+    <h2>Inventory</h2>
+    <div class="inventory-wrapper">
+        {{#if partyInventory.length}}
+        <ul class="inventory-list">
+            {{#each partyInventory}}
+            <li class="item item-entry flexrow reveal-hidden" data-id="{{id}}" data-name="{{name}}" data-type="{{type}}">
+                <div class="item-image">
+                    <img src="{{img}}" alt="{{name}}" title="{{name}}" />
+                </div>
+                <div class="item-details">
+                    <strong class="item-name">{{name}}</strong>
+                    <span class="item-quantity">(Quantity: {{quantity}})</span>
+                    <span class="item-weight">Weight: {{weight}}</span>
+                    {{#if isEquipped}}
+                    <span class="item-equipped">(Equipped)</span>
+                    {{/if}}
+                    {{#if (not isIdentified)}}
+                    <span class="item-unidentified">(Unidentified)</span>
+                    {{/if}}
+                </div>
+            </li>
+            {{else}}
+            <li>No items in inventory.</li>
+            {{/each}}
+        </ul>
+        {{else}}
+        <p>No items found in party inventory.</p>
+        {{/if}}
+    </div>
+</div>
+
+
 
             <!-- Quests Tab -->
             <div class="tab-content quests" data-tab="quests" style="display: none;">

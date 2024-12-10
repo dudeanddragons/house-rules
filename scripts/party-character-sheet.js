@@ -41,6 +41,7 @@ async getData() {
     const data = await super.getData();
 
     try {
+        // Ensure GM-specific data is set
         data.isGM = game.user.isGM;
         data.showDMNotesTab = game.user.isGM;
 
@@ -77,13 +78,65 @@ async getData() {
             };
         });
 
-        console.log("PartyCharacterSheet | Data prepared with watchOrder, marchingOrder, and partyMembers:", data);
+        // Fetch and prepare Party Inventory data for the Party Character Actor only
+        const inventory = this.actor.items.map(item => ({
+            id: item.id,
+            name: item.name,
+            img: item.img,
+            type: item.type,
+            quantity: item.system?.quantity || 1,
+            weight: (item.system?.weight || 0) * (item.system?.quantity || 1),
+            isEquipped: item.system?.location?.state === 'equipped',
+            isIdentified: item.system?.attributes?.identified ?? true,
+            // Add additional fields or derived data if needed
+        }));
+
+        // Process inventory data
+        data.partyInventory = this.prepareInventory(inventory);
+
+        console.log("PartyCharacterSheet | Data prepared:", data);
         return data;
     } catch (error) {
         console.error("PartyCharacterSheet | Error preparing data:", error);
         return data;
     }
 }
+
+/**
+ * Process inventory data for the party character actor.
+ * @param {Array} inventory - The raw inventory data array.
+ * @returns {Array} Processed inventory array with additional derived data.
+ */
+prepareInventory(inventory) {
+    if (!Array.isArray(inventory)) {
+        console.error("Inventory | Invalid inventory data:", inventory);
+        return [];
+    }
+
+    console.log("Inventory | Preparing inventory data.");
+    return inventory.map(item => ({
+        ...item,
+        weight: (item.weight || 0).toFixed(2), // Format weight to two decimal places
+        displayName: item.isIdentified ? item.name : "Unknown Item", // Handle unidentified items
+    }));
+}
+
+
+
+/**
+ * Prepare inventory data specifically for the party sheet.
+ * @param {Array} inventory - The raw inventory data array.
+ * @returns {Array} Processed inventory array with additional derived data.
+ */
+prepareInventory(inventory) {
+    if (!Array.isArray(inventory)) return [];
+    return inventory.map(item => ({
+        ...item,
+        weight: (item.weight || 0).toFixed(2), // Format weight to two decimal places
+        displayName: item.isIdentified ? item.name : "Unknown Item", // Example of conditional processing
+    }));
+}
+
 
 
 

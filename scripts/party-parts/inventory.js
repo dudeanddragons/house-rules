@@ -1,17 +1,20 @@
-// scripts/party-parts/inventory.js
-console.log("inventory.js loaded successfully.");
-
 export class Inventory {
     /**
-     * Fetch and prepare dummy inventory data.
-     * @returns {Array} An array of inventory item objects with placeholder data.
+     * Process inventory data for the party sheet.
+     * @param {Array} inventory - The raw inventory data array.
+     * @returns {Array} Processed inventory array with additional derived data.
      */
-    static getInventory() {
-        console.log("Inventory | Fetching dummy inventory data.");
-        return [
-            { name: "Potion of Healing", quantity: 3 },
-            { name: "Rope (50 ft)", quantity: 1 },
-            { name: "Torch", quantity: 10 }
-        ];
+    static prepareInventory(inventory) {
+        if (!Array.isArray(inventory)) {
+            console.error("Inventory | Invalid inventory data:", inventory);
+            return [];
+        }
+
+        console.log("Inventory | Preparing inventory data.");
+        return inventory.map(item => ({
+            ...item,
+            weight: (item.weight || 0).toFixed(2), // Ensure weight is formatted
+            displayName: item.isIdentified ? item.name : "Unknown Item", // Handle unidentified items
+        }));
     }
 }
