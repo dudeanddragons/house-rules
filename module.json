@@ -97,6 +97,6 @@
       "system": "ars"
     }
   ],
-  "manifest": "https://raw.githubusercontent.com/<your-github-username>/<repository-name>/main/module.json",
-  "download": "https://github.com/<your-github-username>/<repository-name>/releases/download/v12.241209.01/house-rules.zip"
+  "manifest": "https://raw.githubusercontent.com/dudeanddragons/house-rules/refs/heads/master/module.json",
+  "download": "https://github.com/dudeanddragons/house-rules/releases/tag/12.241209.01.zip"
 }
