@@ -1,13 +1,13 @@
 {
   "id": "house-rules",
   "title": "House Rules",
-  "version": "1.0.0",
+  "version": "12.241209.01",
   "compatibility": {
     "minimum": "12",
     "verified": "12"
   },
   "description": "Frank's House Rules",
-"esmodules": [
+  "esmodules": [
     "scripts/attack-listener.js",
     "scripts/critical-tables.js",
     "scripts/treasureBuilder.js",
@@ -30,7 +30,7 @@
     "scripts/magicItems/itemsScrolls.js",
     "scripts/magicItems/itemsWands.js",
     "scripts/assetFolder.js"
-],
+  ],
   "templates": [
     "templates/party-character.hbs",
     "templates/party-sheet-cards.hbs",
@@ -96,5 +96,7 @@
       },
       "system": "ars"
     }
-  ]
+  ],
+  "manifest": "https://raw.githubusercontent.com/<your-github-username>/<repository-name>/main/module.json",
+  "download": "https://github.com/<your-github-username>/<repository-name>/releases/download/v12.241209.01/house-rules.zip"
 }
