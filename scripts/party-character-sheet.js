@@ -269,17 +269,20 @@ activateListeners(html) {
             return;
         }
     
-        // Prepare the drag data
+        // Prepare drag data
         const dragData = {
             type: "Item",
             id: item.id,
+            uuid: item.uuid, // Ensure ARS has access to the UUID
             actorId: this.actor.id,
+            sourceUuid: this.actor.uuid, // Add the source actor's UUID
         };
     
-        // Set drag data in the event's dataTransfer
         event.originalEvent.dataTransfer.setData("text/plain", JSON.stringify(dragData));
         console.log("PartyCharacterSheet | Dragging item:", dragData);
     });
+    
+    
 
 }
 
@@ -299,6 +302,7 @@ _activateDragDrop(html) {
 }
 
 
+
 /**
  * Handle the onDrop logic with data types.
  * @param {DragEvent} event - The drag event.
@@ -307,20 +311,14 @@ _activateDragDrop(html) {
 async _handleOnDrop(event, data) {
     console.log("PartyCharacterSheet | Handling drop event", { event, data });
 
-    // Check if data is undefined and parse it manually
     if (!data) {
-        const dropData = event.dataTransfer.getData("text/plain");
-        if (!dropData) {
-            console.error("PartyCharacterSheet | Drop data is undefined.");
-            return ui.notifications.error("Invalid drop data. Please try again.");
-        }
-        data = JSON.parse(dropData);
+        console.error("PartyCharacterSheet | Drop data is undefined.");
+        return ui.notifications.error("Invalid drop data. Please try again.");
     }
 
-    console.log("PartyCharacterSheet | Parsed drop data:", data);
-
-    // Handle drop types
+    // Determine data type and process accordingly
     const type = data.type || (data.items && data.items[0]?.type);
+
     if (!type) {
         console.error("PartyCharacterSheet | Drop type is undefined:", data);
         return ui.notifications.error("Unsupported drop type.");
@@ -329,51 +327,69 @@ async _handleOnDrop(event, data) {
     switch (type) {
         case "Item":
             return this._onDropItem(event, data);
-        case "Actor":
-            return this._onDropActor(event, data);
-        case "Folder":
-            return this._onDropFolder(event, data);
-        case "ActiveEffect":
-            return this._onDropActiveEffect(event, data);
         default:
-            console.warn("PartyCharacterSheet | Unsupported drop type:", type);
-            return;
+            console.warn("Unsupported drop type:", type);
+            break;
     }
 }
 
-
 /**
  * Handle dropped items specifically for the inventory.
+ * Supports ARS-like data structure for cross-actor interaction.
  * @param {DragEvent} event - The drag event.
  * @param {Object} data - The data associated with the dropped item.
  */
 async _onDropItem(event, data) {
     console.log("PartyCharacterSheet | Dropping item data:", data);
 
-    // Resolve the item from the drop data
-    const item = await Item.implementation.fromDropData(data);
+    let item;
+    try {
+        // Support ARS-style drag data structure
+        if (data.uuid) {
+            item = await fromUuid(data.uuid);
+        } else if (data.id && data.actorId) {
+            const sourceActor = game.actors.get(data.actorId);
+            item = sourceActor ? sourceActor.items.get(data.id) : null;
+        }
 
-    if (!item) {
-        console.error("PartyCharacterSheet | Item data is invalid.");
-        return ui.notifications.error("Invalid item data. Please try again.");
+        if (!item) {
+            console.error("PartyCharacterSheet | Item not found in drop data:", data);
+            return ui.notifications.error("Item not found.");
+        }
+    } catch (err) {
+        console.error("PartyCharacterSheet | Failed to resolve item from drop data:", err);
+        return;
     }
 
-    // Ensure the actor exists
+    // Determine target actor
     const targetActor = this.actor;
+
     if (!targetActor) {
         console.error("PartyCharacterSheet | Target actor not found.");
         return ui.notifications.error("Target actor not found.");
     }
 
-    // Clone the item to the actor
+    // Clone the item to the target actor
     const newItem = await targetActor.createEmbeddedDocuments("Item", [item.toObject()]);
     if (newItem) {
-        ui.notifications.info(`Added "${item.name}" to the inventory.`);
-        console.log(`PartyCharacterSheet | Item added to inventory:`, newItem);
+        ui.notifications.info(`Added "${item.name}" to ${targetActor.name}.`);
+        console.log("PartyCharacterSheet | Item added to target actor:", newItem);
+
+        // Optionally remove the item from the source actor (if ARS logic is followed)
+        if (data.actorId && data.actorId !== targetActor.id) {
+            const sourceActor = game.actors.get(data.actorId);
+            if (sourceActor) {
+                await sourceActor.deleteEmbeddedDocuments("Item", [item.id]);
+                console.log(`PartyCharacterSheet | Removed "${item.name}" from source actor.`);
+            }
+        }
     } else {
-        ui.notifications.error("Failed to add item to inventory.");
+        ui.notifications.error("Failed to add item to target inventory.");
     }
 }
+
+
+
 
 
 /**
