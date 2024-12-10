@@ -26,15 +26,9 @@ export class PartyCharacterSheet extends ActorSheet {
             height: 600,
             resizable: true,
             tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "members" }],
-            dragDrop: [{ dragSelector: ".item-list .item", dropSelector: null }],
+            dragDrop: [{ dragSelector: ".item-list .item", dropSelector: ".tab-content.inventory" }],
         });
     }
-
-
-
-
-
-
 
 /** @override */
 async getData() {
@@ -133,29 +127,6 @@ prepareInventory(inventory) {
     }));
 }
 
-
-
-/**
- * Prepare inventory data specifically for the party sheet.
- * @param {Array} inventory - The raw inventory data array.
- * @returns {Array} Processed inventory array with additional derived data.
- */
-prepareInventory(inventory) {
-    if (!Array.isArray(inventory)) return [];
-    return inventory.map(item => ({
-        ...item,
-        weight: (item.weight || 0).toFixed(2), // Format weight to two decimal places
-        displayName: item.isIdentified ? item.name : "Unknown Item", // Example of conditional processing
-    }));
-}
-
-
-
-
-
-
-
-
 /** @override */
 activateListeners(html) {
     super.activateListeners(html);
@@ -170,7 +141,6 @@ activateListeners(html) {
 
     // Initialize tab navigation and drag-and-drop functionality
     this._initializeTabs(html);
-    this._activateDragDropListeners(html);
 
     // Watch Order Input Listener
     html.find(".watch-order-input").on("change", async (event) => {
@@ -283,35 +253,180 @@ activateListeners(html) {
         console.log(`Activating formation: ${formation} with direction: ${direction}`);
         await this._dropMarchingOrder(formation, direction);
     });
-    
 
-    console.log("Listeners for watch order, marching order, and marching formation buttons activated successfully.");
+
+
+
+
+    
+    html.find(".item").on("dragstart", (event) => {
+        const li = event.currentTarget;
+        const itemId = li.dataset.id;
+        const item = this.actor.items.get(itemId);
+    
+        if (!item) {
+            console.error("PartyCharacterSheet | Item not found for drag:", itemId);
+            return;
+        }
+    
+        // Prepare the drag data
+        const dragData = {
+            type: "Item",
+            id: item.id,
+            actorId: this.actor.id,
+        };
+    
+        // Set drag data in the event's dataTransfer
+        event.originalEvent.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+        console.log("PartyCharacterSheet | Dragging item:", dragData);
+    });
+
 }
 
-/** Initialize drag-and-drop functionality */
-_activateDragDropListeners(html) {
+/**
+ * Initialize drag-and-drop functionality.
+ * @param {HTMLElement} html - The rendered HTML content.
+ */
+_activateDragDrop(html) {
     const dragDrop = new DragDrop({
         dragSelector: ".item-list .item",
-        dropSelector: null,
+        dropSelector: ".tab-content.inventory, .sheet-body",
         callbacks: {
-            drop: this._onDropItem.bind(this),
+            drop: this._handleOnDrop.bind(this),
         },
     });
     dragDrop.bind(html[0]);
 }
 
-/** Handle dropped items */
-async _onDropItem(event) {
-    const data = TextEditor.getDragEventData(event);
-    if (!data) return;
 
-    try {
-        await this.actor.createEmbeddedDocuments("Item", [data]);
-        console.log("PartyCharacterSheet | Successfully created dropped item.");
-    } catch (error) {
-        console.error("PartyCharacterSheet | Failed to create dropped item:", error);
+/**
+ * Handle the onDrop logic with data types.
+ * @param {DragEvent} event - The drag event.
+ * @param {Object} data - The data associated with the drag.
+ */
+async _handleOnDrop(event, data) {
+    console.log("PartyCharacterSheet | Handling drop event", { event, data });
+
+    // Check if data is undefined and parse it manually
+    if (!data) {
+        const dropData = event.dataTransfer.getData("text/plain");
+        if (!dropData) {
+            console.error("PartyCharacterSheet | Drop data is undefined.");
+            return ui.notifications.error("Invalid drop data. Please try again.");
+        }
+        data = JSON.parse(dropData);
+    }
+
+    console.log("PartyCharacterSheet | Parsed drop data:", data);
+
+    // Handle drop types
+    const type = data.type || (data.items && data.items[0]?.type);
+    if (!type) {
+        console.error("PartyCharacterSheet | Drop type is undefined:", data);
+        return ui.notifications.error("Unsupported drop type.");
+    }
+
+    switch (type) {
+        case "Item":
+            return this._onDropItem(event, data);
+        case "Actor":
+            return this._onDropActor(event, data);
+        case "Folder":
+            return this._onDropFolder(event, data);
+        case "ActiveEffect":
+            return this._onDropActiveEffect(event, data);
+        default:
+            console.warn("PartyCharacterSheet | Unsupported drop type:", type);
+            return;
     }
 }
+
+
+/**
+ * Handle dropped items specifically for the inventory.
+ * @param {DragEvent} event - The drag event.
+ * @param {Object} data - The data associated with the dropped item.
+ */
+async _onDropItem(event, data) {
+    console.log("PartyCharacterSheet | Dropping item data:", data);
+
+    // Resolve the item from the drop data
+    const item = await Item.implementation.fromDropData(data);
+
+    if (!item) {
+        console.error("PartyCharacterSheet | Item data is invalid.");
+        return ui.notifications.error("Invalid item data. Please try again.");
+    }
+
+    // Ensure the actor exists
+    const targetActor = this.actor;
+    if (!targetActor) {
+        console.error("PartyCharacterSheet | Target actor not found.");
+        return ui.notifications.error("Target actor not found.");
+    }
+
+    // Clone the item to the actor
+    const newItem = await targetActor.createEmbeddedDocuments("Item", [item.toObject()]);
+    if (newItem) {
+        ui.notifications.info(`Added "${item.name}" to the inventory.`);
+        console.log(`PartyCharacterSheet | Item added to inventory:`, newItem);
+    } else {
+        ui.notifications.error("Failed to add item to inventory.");
+    }
+}
+
+
+/**
+ * Handle dropped actors.
+ * @param {DragEvent} event - The drag event.
+ * @param {Object} data - The data associated with the dropped actor.
+ */
+async _onDropActor(event, data) {
+    console.log("PartyCharacterSheet | Dropping actor data:", data);
+
+    const actor = await Actor.implementation.fromDropData(data);
+
+    if (!actor) {
+        console.error("PartyCharacterSheet | Dropped actor could not be resolved.");
+        return;
+    }
+
+    ui.notifications.info(`Actor "${actor.name}" dropped onto the Party Character Sheet.`);
+    console.log(`PartyCharacterSheet | Actor dropped:`, actor);
+}
+
+/**
+ * Handle dropped folders (if applicable).
+ * @param {DragEvent} event - The drag event.
+ * @param {Object} data - The data associated with the dropped folder.
+ */
+async _onDropFolder(event, data) {
+    console.warn("PartyCharacterSheet | Folder drops are not implemented.");
+    ui.notifications.warn("Folder drops are not supported on the Party Character Sheet.");
+}
+
+/**
+ * Handle dropped active effects (if applicable).
+ * @param {DragEvent} event - The drag event.
+ * @param {Object} data - The data associated with the dropped effect.
+ */
+async _onDropActiveEffect(event, data) {
+    console.warn("PartyCharacterSheet | Active Effect drops are not implemented.");
+    ui.notifications.warn("Active Effect drops are not supported on the Party Character Sheet.");
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * Get the facing direction of a token based on its rotation.
@@ -325,7 +440,6 @@ _getFacingDirection(token) {
     if (rotation >= 225 && rotation < 315) return "W";
     return "N";
 }
-
 
 /**
  * Drop party members on the canvas based on the selected marching order formation and direction.
@@ -373,9 +487,6 @@ async _dropMarchingOrder(formation, direction) {
     ui.notifications.info(`Marching order "${formation}" deployed successfully.`);
 }
 
-
-
-
 /**
  * Prompt the user to click on the canvas for the starting point.
  * @returns {Promise<Object>} - The {x, y} coordinates of the starting point.
@@ -391,7 +502,6 @@ async _getStartingPoint() {
         ui.notifications.info("Click on the canvas to set the starting point for the marching order.");
     });
 }
-
 
 /**
  * Initialize directional control listeners for all formations.
@@ -419,9 +529,6 @@ _activateDirectionalControlListeners(html) {
         await this._dropMarchingOrder(formation, direction);
     });
 }
-
-
-
 
 /**
  * Prompt the user to select a facing direction.
@@ -454,7 +561,6 @@ async _selectFacingDirection() {
         });
     });
 }
-
 
 /**
  * Calculate token positions based on formation and facing direction.
@@ -554,8 +660,7 @@ const offset = (dx, dy) => {
                     hexIndex += 6;
                 }
                 break;
-            
-            
+
             case "triangle":
                 // Top center
                 positions.push(offset(0, 0));
@@ -580,21 +685,12 @@ const offset = (dx, dy) => {
                     row++;
                 }
                 break;
-            
-            
-
         default:
             ui.notifications.error("Invalid formation style selected.");
             return [];
     }
-
     return positions.slice(0, count);
 }
-
-
-
-
-
 
 /**
  * Spawn a token for the actor at the specified position using ARS-specific logic.
@@ -634,95 +730,6 @@ async _spawnToken(actor, position) {
     }
 }
 
-
-
-
-
-
-/**
- * Initialize drag-and-drop listeners for item handling.
- * @param {HTMLElement} html - The rendered HTML content.
- */
-_activateDragDropListeners(html) {
-    const dragDrop = new DragDrop({
-        dragSelector: ".item-list .item",
-        dropSelector: null,
-        callbacks: {
-            drop: this._onDropItem.bind(this),
-        },
-    });
-    dragDrop.bind(html[0]);
-    console.log("PartyCharacterSheet | Drag-and-drop listeners initialized successfully.");
-}
-
-/**
- * Handle item drop event on the character sheet.
- * @param {Event} event - The drag-and-drop event.
- */
-async _onDropItem(event) {
-    const data = TextEditor.getDragEventData(event);
-    if (!data) return;
-
-    try {
-        await this.actor.createEmbeddedDocuments("Item", [data]);
-        console.log("PartyCharacterSheet | Item successfully dropped and created:", data);
-    } catch (err) {
-        console.error("PartyCharacterSheet | Failed to create dropped item:", err);
-    }
-}
-
-
-
-
-
-
-
-
-
-
-/**
- * Initialize drag-and-drop listeners for item handling.
- * @param {HTMLElement} html - The rendered HTML content.
- */
-_activateDragDropListeners(html) {
-    const dragDrop = new DragDrop({
-        dragSelector: ".item-list .item",
-        dropSelector: null,
-        callbacks: {
-            drop: this._onDropItem.bind(this),
-        },
-    });
-    dragDrop.bind(html[0]);
-    console.log("PartyCharacterSheet | Drag-and-drop listeners initialized successfully.");
-}
-
-/**
- * Handle item drop event on the character sheet.
- * @param {Event} event - The drag-and-drop event.
- */
-async _onDropItem(event) {
-    const data = TextEditor.getDragEventData(event);
-    if (!data) return;
-
-    try {
-        await this.actor.createEmbeddedDocuments("Item", [data]);
-        console.log("PartyCharacterSheet | Item successfully dropped and created:", data);
-    } catch (err) {
-        console.error("PartyCharacterSheet | Failed to create dropped item:", err);
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
 _initializeTabs(html) {
     const tabs = new Tabs({
         navSelector: ".sheet-tabs",
@@ -746,27 +753,4 @@ _showActiveTab(html) {
     const initialTab = this.options.tabs[0]?.initial || "members";
     html.find(`.tab-content[data-tab="${initialTab}"]`).show();
 }
-
-
-    _activateDragDropListeners(html) {
-        const dragDrop = new DragDrop({
-            dragSelector: ".item-list .item",
-            dropSelector: null,
-            callbacks: {
-                drop: this._onDropItem.bind(this),
-            },
-        });
-        dragDrop.bind(html[0]);
-    }
-
-    async _onDropItem(event) {
-        const data = TextEditor.getDragEventData(event);
-        if (!data) return;
-
-        try {
-            await this.actor.createEmbeddedDocuments("Item", [data]);
-        } catch (err) {
-            console.error("PartyCharacterSheet | Failed to create dropped item:", err);
-        }
-    }
 }
