@@ -1,0 +1,483 @@
+/* Root Variables */
+:root {
+    --party-background: url("/systems/ars/ui/parchment.webp");
+    --party-header-bg: rgba(255, 245, 230, 0.9);
+    --party-border-color: var(--ars_brown);
+    --party-text-color: black;
+    --party-highlight-color: var(--ars_gold);
+    --sheet-tab-color-background: #000000;
+    --sheet-tab-color: #75869f;
+    --sheet-tab-color-active: #ffffff;
+}
+
+/* General Layout */
+.custom-party-character-sheet {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--party-background);
+    background-size: cover;
+    color: var(--party-text-color);
+}
+
+/* Header Styling */
+.sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+
+    color: var(--party-highlight-color);
+    background: var(--party-header-bg);
+}
+
+/* Tabs Styling */
+.custom-party-character-sheet nav.sheet-tabs {
+    border: none;
+    --ars-sheet-header-height: 100px;
+    color: var(--sheet-tab-color);
+}
+
+.custom-party-character-sheet nav.sheet-tabs .tabs {
+    --tab-full-width: 56px;
+    --tab-hover-width: 50px;
+    --tab-inactive-width: 45px;
+    position: absolute;
+    left: 100%;
+    top: calc(var(--ars-sheet-header-height) + 1rem);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    z-index: -1;
+}
+
+/* Tab Item Styling */
+.custom-party-character-sheet nav.sheet-tabs .item,
+.custom-party-character-sheet nav.sheet-tabs .tab-item {
+    width: var(--tab-full-width);
+    height: 60px;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    padding-right: 0.75rem;
+    background: var(--sheet-tab-color-background);
+    color: var(--sheet-tab-color);
+    border-radius: 0 8px 8px 0;
+    font-size: var(--font-size-24);
+    margin-left: calc((var(--tab-full-width) - var(--tab-inactive-width)) * -1);
+    transition: all 250ms ease;
+}
+
+/* Active and Hover Tab Styling */
+.custom-party-character-sheet nav.sheet-tabs .item.active,
+.custom-party-character-sheet nav.sheet-tabs .item:hover,
+.custom-party-character-sheet nav.sheet-tabs .tab-item.active,
+.custom-party-character-sheet nav.sheet-tabs .tab-item:hover {
+    margin: 0;
+    box-shadow: 0 0 6px var(--sheet-tab-color);
+    color: var(--sheet-tab-color-active);
+    background: var(--sheet-tab-color-background);
+}
+
+/* Background Effect for Tabs */
+.custom-party-character-sheet nav.sheet-tabs .item::after,
+.custom-party-character-sheet nav.sheet-tabs .tab-item::after {
+    content: "";
+    position: absolute;
+    inset: 0.25rem 0.25rem 0.25rem 0;
+    pointer-events: none;
+}
+
+/* Members Tab Styling */
+.party-members-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+.party-members-table th {
+    background-color: var(--ars_brown);
+    color: white;
+    padding: 8px;
+    border: 1px solid var(--party-border-color);
+}
+
+.party-members-table td {
+    padding: 8px;
+    border: 1px solid var(--party-border-color);
+}
+
+.portrait-cell {
+    width: 40px;
+}
+
+.member-img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Skills Tab Styling */
+.tab-content.skills {
+    padding: 10px;
+}
+
+.skills-list {
+    list-style-type: square;
+    padding-left: 20px;
+}
+
+.skills-list li {
+    padding: 5px;
+}
+
+/* Inventory Tab Styling */
+.tab-content.inventory {
+    padding: 10px;
+}
+
+.inventory-list {
+    list-style-type: disc;
+    padding-left: 20px;
+}
+
+.inventory-list li {
+    padding: 5px;
+}
+
+/* Quests Tab Styling */
+.tab-content.quests {
+    padding: 10px;
+}
+
+.tab-content.quests ul {
+    list-style-type: circle;
+    padding-left: 20px;
+}
+
+/* DM Notes Tab Styling */
+.tab-content.dm-notes {
+    padding: 10px;
+}
+
+.tab-content.dm-notes textarea {
+    width: 100%;
+    height: 250px;
+    resize: vertical;
+    padding: 5px;
+    font-size: 14px;
+    border: 1px solid var(--party-border-color);
+    border-radius: 5px;
+}
+
+/* Chat Cards Styling */
+.chat-cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.chat-card {
+    width: 220px;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--party-border-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Collapsible Section Styling */
+.collapsible-header {
+    cursor: pointer;
+    padding: 10px;
+    font-weight: bold;
+    background: var(--party-header-bg);
+    border: 1px solid var(--party-border-color);
+}
+
+.collapsible-content {
+    display: none;
+    padding: 10px;
+}
+
+/* Error Message Styling */
+.error-message {
+    color: red;
+    font-weight: bold;
+    padding: 10px;
+    background: rgba(255, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+/* Parchment Background */
+.custom-party-character-sheet {
+    background: var(--party-background);
+    background-size: cover;
+}
+/* Root Variables */
+:root {
+    --party-background: url("/systems/ars/ui/parchment.webp");
+    --party-header-bg: rgba(255, 245, 230, 0.9);
+    --party-border-color: var(--ars_brown);
+    --party-text-color: black;
+    --party-highlight-color: var(--ars_gold);
+    --sheet-tab-color-background: #000000;
+    --sheet-tab-color: #75869f;
+    --sheet-tab-color-active: #ffffff;
+}
+
+/* General Layout */
+.custom-party-character-sheet {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--party-background);
+    background-size: cover;
+    color: var(--party-text-color);
+}
+
+/* Header Styling */
+.sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid var(--ars_navy);
+    color: var(--party-highlight-color);
+    background: var(--party-header-bg);
+}
+
+/* Tab Navigation */
+.custom-party-character-sheet nav.sheet-tabs {
+    border: none;
+    color: var(--sheet-tab-color);
+}
+
+/* Tab Items */
+.custom-party-character-sheet nav.sheet-tabs .item,
+.custom-party-character-sheet nav.sheet-tabs .tab-item {
+    width: 56px;
+    height: 60px;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    padding-right: 0.75rem;
+    background: var(--sheet-tab-color-background);
+    color: var(--sheet-tab-color);
+    border-radius: 0 8px 8px 0;
+    margin-left: -11px;
+    transition: all 250ms ease;
+}
+
+/* Active Tab */
+.custom-party-character-sheet nav.sheet-tabs .item.active,
+.custom-party-character-sheet nav.sheet-tabs .item:hover {
+    margin: 0;
+    box-shadow: 0 0 6px var(--sheet-tab-color);
+    color: var(--sheet-tab-color-active);
+}
+
+/* Party Members Styling */
+.party-members-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+.party-members-table th {
+    background-color: var(--ars_brown);
+    color: white;
+    padding: 8px;
+    border: 1px solid var(--party-border-color);
+}
+
+.party-members-table td {
+    padding: 8px;
+    border: 1px solid var(--party-border-color);
+}
+
+/* Chat Card Styling */
+.chat-cards-container {
+    padding: 10px;
+}
+
+.chat-card {
+    width: 220px;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--party-border-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.chat-card img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    float: left;
+    margin-right: 10px;
+}
+
+/* Member Controls */
+.member-base-controls {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 5px;
+}
+
+/* Member Stats */
+.member-stats {
+    font-family: "Signika";
+    font-size: small;
+    margin-top: 3px;
+    color: var(--party-text-color);
+}
+
+/* Health and Progress Bars */
+#progress-container {
+    height: 10px;
+}
+
+#progress-bar {
+    height: 8px;
+    background-color: var(--ars_gold);
+}
+
+/* Collapsible Sections */
+.collapsible-header {
+    cursor: pointer;
+    padding: 10px;
+    font-weight: bold;
+    background: var(--party-header-bg);
+    border: 1px solid var(--party-border-color);
+}
+
+.collapsible-content {
+    display: none;
+    padding: 10px;
+}
+
+/* Hover Effects */
+.chat-card:hover,
+.tracker-entry-bar:hover {
+    transform: scale(1.01);
+}
+
+/* Parchment Background */
+.tracker-entry-bar {
+    background: url("/systems/ars/ui/parchment.webp") repeat;
+    border-radius: 6px;
+    padding: 5px;
+}
+
+/* Watch Orders Table Styling */
+.watch-orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+.watch-orders-table th,
+.watch-orders-table td {
+    padding: 10px;
+    border: 1px solid var(--party-border-color);
+}
+
+.portrait-cell img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.watch-order-input,
+.marching-order-input {
+    width: 50px;
+    text-align: center;
+}
+
+.marching-order-buttons {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+}
+
+.marching-style-button {
+    padding: 5px 10px;
+    border: 1px solid var(--party-border-color);
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.marching-style-button:hover {
+    background-color: var(--party-highlight-color);
+}
+.marching-order-images {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.marching-style-container {
+    text-align: center;
+    width: 120px;
+}
+
+.marching-style-container img {
+    width: 100%;
+    height: auto;
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    transition: border-color 0.2s ease;
+}
+
+.marching-style-container img:hover {
+    border-color: var(--party-highlight-color);
+}
+
+.marching-style-container p {
+    margin-top: 5px;
+    font-size: 0.9rem;
+    color: var(--party-text-color);
+}
+
+.arrow-buttons-cell {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    width: 24px;
+}
+
+.arrow-up,
+.arrow-down {
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    font-size: 12px;
+    line-height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid var(--party-border-color);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.arrow-up:hover,
+.arrow-down:hover {
+    background-color: rgba(200, 200, 200, 0.8);
+}
+
+.member-img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-left: 5px;
+}

@@ -1,0 +1,249 @@
+{{log "party-character.hbs this-->" this}}
+
+<form class="custom-party-character-sheet" autocomplete="off">
+    <div class="party-sheet">
+
+        <!-- Side Tab Navigation -->
+        <nav class="sheet-tabs" data-group="primary">
+            <div class="tabs flexcol">
+                <a class="item tab-item" data-tab="members" data-tooltip="Members">
+                    <i class="fas fa-users"></i>
+                </a>
+                <a class="item tab-item" data-tab="skills" data-tooltip="Skills">
+                    <i class="fas fa-hat-wizard"></i>
+                </a>
+                <a class="item tab-item" data-tab="inventory" data-tooltip="Inventory">
+                    <i class="fas fa-treasure-chest"></i>
+                </a>
+                <a class="item tab-item" data-tab="quests" data-tooltip="Quests">
+                    <i class="fas fa-book-open"></i>
+                </a>
+                {{#if showDMNotesTab}}
+                <a class="item tab-item" data-tab="dm-notes" data-tooltip="DM Notes">
+                    <i class="fas fa-book"></i>
+                </a>
+                {{/if}}
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <section class="sheet-body">
+
+        <!-- Members and Orders Tab -->
+        <div class="tab-content members" data-tab="members">
+
+            <!-- Party Members Table -->
+            <table class="members-table">
+                <thead>
+                    <tr>
+                        <th>Portrait</th>
+                        <th>Name</th>
+                        <th>Watch Order</th>
+                        <th>Marching Order</th>
+                    </tr>
+                </thead>
+                <tbody id="members-list">
+                    {{#each orderData}}
+                        <tr class="member-row" data-actor-id="{{id}}">
+                            <td><img src="{{img}}" alt="{{name}}" class="member-img"></td>
+                            <td>{{name}}</td>
+                            <td>
+                                <input 
+                                    type="number" 
+                                    class="watch-order-input" 
+                                    data-actor-id="{{id}}" 
+                                    value="{{watchOrder}}" 
+                                    min="0" 
+                                    placeholder="{{watchOrder}}"
+                                >
+                            </td>
+                            <td>
+                                <input 
+                                    type="number" 
+                                    class="marching-order-input" 
+                                    data-actor-id="{{id}}" 
+                                    value="{{marchingOrder}}" 
+                                    min="0" 
+                                    placeholder="{{marchingOrder}}"
+                                >
+                            </td>
+                        </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+<!-- Marching Order Formation Options -->
+<h3>Select Marching Order Formation</h3>
+<div class="marching-order-images">
+
+
+    <div class="marching-style-container">
+        <img src="modules/house-rules/ui/single-file.png" alt="Single File" class="marching-order-style" data-style="single-file">
+        <p>Single File</p>
+        <div class="directional-control">
+            <table class="direction-table">
+                <tr>
+                    <td><button class="direction-button" data-style="single-file" data-direction="NW"><i class="fas fa-arrow-up-left"></i></button></td>
+                    <td><button class="direction-button" data-style="single-file" data-direction="N"><i class="fas fa-arrow-up"></i></button></td>
+                    <td><button class="direction-button" data-style="single-file" data-direction="NE"><i class="fas fa-arrow-up-right"></i></button></td>
+                </tr>
+                <tr>
+                    <td><button class="direction-button" data-style="single-file" data-direction="W"><i class="fas fa-arrow-left"></i></button></td>
+                    <td><button class="activate-formation-button" data-style="single-file"><i class="fas fa-play"></i></button></td>
+                    <td><button class="direction-button" data-style="single-file" data-direction="E"><i class="fas fa-arrow-right"></i></button></td>
+                </tr>
+                <tr>
+                    <td><button class="direction-button" data-style="single-file" data-direction="SW"><i class="fas fa-arrow-down-left"></i></button></td>
+                    <td><button class="direction-button" data-style="single-file" data-direction="S"><i class="fas fa-arrow-down"></i></button></td>
+                    <td><button class="direction-button" data-style="single-file" data-direction="SE"><i class="fas fa-arrow-down-right"></i></button></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+
+    <div class="marching-style-container">
+        <img src="modules/house-rules/ui/dual-column.png" alt="Dual Column" class="marching-order-style" data-style="dual-column">
+        <p>Dual Column</p>
+        <div class="directional-control">
+            <table class="direction-table">
+                <tr>
+                    <td><button class="direction-button" data-style="dual-column" data-direction="NW"><i class="fas fa-arrow-up-left"></i></button></td>
+                    <td><button class="direction-button" data-style="dual-column" data-direction="N"><i class="fas fa-arrow-up"></i></button></td>
+                    <td><button class="direction-button" data-style="dual-column" data-direction="NE"><i class="fas fa-arrow-up-right"></i></button></td>
+                </tr>
+                <tr>
+                    <td><button class="direction-button" data-style="dual-column" data-direction="W"><i class="fas fa-arrow-left"></i></button></td>
+                    <td><button class="activate-formation-button" data-style="dual-column"><i class="fas fa-play"></i></button></td>
+                    <td><button class="direction-button" data-style="dual-column" data-direction="E"><i class="fas fa-arrow-right"></i></button></td>
+                </tr>
+                <tr>
+                    <td><button class="direction-button" data-style="dual-column" data-direction="SW"><i class="fas fa-arrow-down-left"></i></button></td>
+                    <td><button class="direction-button" data-style="dual-column" data-direction="S"><i class="fas fa-arrow-down"></i></button></td>
+                    <td><button class="direction-button" data-style="dual-column" data-direction="SE"><i class="fas fa-arrow-down-right"></i></button></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="marching-style-container">
+        <img src="modules/house-rules/ui/t-formation.png" alt="T Formation" class="marching-order-style" data-style="t-formation">
+        <p>T Formation</p>
+        <div class="directional-control">
+            <table class="direction-table">
+                <tr>
+                    <td><button class="direction-button" data-style="t-formation" data-direction="NW"><i class="fas fa-arrow-up-left"></i></button></td>
+                    <td><button class="direction-button" data-style="t-formation" data-direction="N"><i class="fas fa-arrow-up"></i></button></td>
+                    <td><button class="direction-button" data-style="T Formation" data-direction="NE"><i class="fas fa-arrow-up-right"></i></button></td>
+                </tr>
+                <tr>
+                    <td><button class="direction-button" data-style="t-formation" data-direction="W"><i class="fas fa-arrow-left"></i></button></td>
+                    <td><button class="activate-formation-button" data-style="t-formation"><i class="fas fa-play"></i></button></td>
+                    <td><button class="direction-button" data-style="t-formation" data-direction="E"><i class="fas fa-arrow-right"></i></button></td>
+                </tr>
+                <tr>
+                    <td><button class="direction-button" data-style="t-formation" data-direction="SW"><i class="fas fa-arrow-down-left"></i></button></td>
+                    <td><button class="direction-button" data-style="t-formation" data-direction="S"><i class="fas fa-arrow-down"></i></button></td>
+                    <td><button class="direction-button" data-style="t-formation" data-direction="SE"><i class="fas fa-arrow-down-right"></i></button></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="marching-style-container">
+        <img src="modules/house-rules/ui/hex-formation.png" alt="Hex Formation" class="marching-order-style" data-style="hex-formation">
+        <p>Hex Formation</p>
+        <div class="directional-control">
+            <table class="direction-table">
+                <tr>
+                    <td><button class="direction-button" data-style="hex-formation" data-direction="NW"><i class="fas fa-arrow-up-left"></i></button></td>
+                    <td><button class="direction-button" data-style="hex-formation" data-direction="N"><i class="fas fa-arrow-up"></i></button></td>
+                    <td><button class="direction-button" data-style="hex-formation" data-direction="NE"><i class="fas fa-arrow-up-right"></i></button></td>
+                </tr>
+                <tr>
+                    <td><button class="direction-button" data-style="hex-formation" data-direction="W"><i class="fas fa-arrow-left"></i></button></td>
+                    <td><button class="activate-formation-button" data-style="hex-formation"><i class="fas fa-play"></i></button></td>
+                    <td><button class="direction-button" data-style="hex-formation" data-direction="E"><i class="fas fa-arrow-right"></i></button></td>
+                </tr>
+                <tr>
+                    <td><button class="direction-button" data-style="hex-formation" data-direction="SW"><i class="fas fa-arrow-down-left"></i></button></td>
+                    <td><button class="direction-button" data-style="hex-formation" data-direction="S"><i class="fas fa-arrow-down"></i></button></td>
+                    <td><button class="direction-button" data-style="hex-formation" data-direction="SE"><i class="fas fa-arrow-down-right"></i></button></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="marching-style-container">
+        <img src="modules/house-rules/ui/triangle.png" alt="Triangle" class="marching-order-style" data-style="triangle">
+        <p>Triangle</p>
+        <div class="directional-control">
+            <table class="direction-table">
+                <tr>
+                    <td><button class="direction-button" data-style="triangle" data-direction="NW"><i class="fas fa-arrow-up-left"></i></button></td>
+                    <td><button class="direction-button" data-style="triangle" data-direction="N"><i class="fas fa-arrow-up"></i></button></td>
+                    <td><button class="direction-button" data-style="triangle" data-direction="NE"><i class="fas fa-arrow-up-right"></i></button></td>
+                </tr>
+                <tr>
+                    <td><button class="direction-button" data-style="triangle" data-direction="W"><i class="fas fa-arrow-left"></i></button></td>
+                    <td><button class="activate-formation-button" data-style="triangle"><i class="fas fa-play"></i></button></td>
+                    <td><button class="direction-button" data-style="triangle" data-direction="E"><i class="fas fa-arrow-right"></i></button></td>
+                </tr>
+                <tr>
+                    <td><button class="direction-button" data-style="triangle" data-direction="SW"><i class="fas fa-arrow-down-left"></i></button></td>
+                    <td><button class="direction-button" data-style="triangle" data-direction="S"><i class="fas fa-arrow-down"></i></button></td>
+                    <td><button class="direction-button" data-style="triangle" data-direction="SE"><i class="fas fa-arrow-down-right"></i></button></td>
+                </tr>
+            </table>
+            </div>
+        </div>
+    </div>
+</div>
+            <!-- Skills Tab -->
+            <div class="tab-content skills" data-tab="skills" style="display: none;">
+                <h2>Skills</h2>
+                <ul class="skills-list">
+                    {{#each skills}}
+                    <li><strong>{{this.name}}</strong>: {{this.value}}</li>
+                    {{else}}
+                    <li>No skills available.</li>
+                    {{/each}}
+                </ul>
+            </div>
+
+            <!-- Inventory Tab -->
+            <div class="tab-content inventory" data-tab="inventory" style="display: none;">
+                <h2>Inventory</h2>
+                <ul class="inventory-list">
+                    {{#each inventory}}
+                    <li><strong>{{this.name}}</strong> (Quantity: {{this.quantity}})</li>
+                    {{else}}
+                    <li>No items in inventory.</li>
+                    {{/each}}
+                </ul>
+            </div>
+
+            <!-- Quests Tab -->
+            <div class="tab-content quests" data-tab="quests" style="display: none;">
+                <h2>Quests</h2>
+                <ul>
+                    <li>Quest 1: Placeholder data</li>
+                    <li>Quest 2: Placeholder data</li>
+                </ul>
+            </div>
+
+            <!-- DM Notes Tab (GM-only view) -->
+            <div class="tab-content dm-notes" data-tab="dm-notes" style="display: none;">
+                <h2>DM Notes</h2>
+                <textarea placeholder="Enter DM-only notes here...">{{dmNotes}}</textarea>
+
+                <!-- Collapsible Party Overview Section -->
+                <div class="collapsible-section">
+                    <h3 class="collapsible-header">Party Overview</h3>
+                    <div class="collapsible-content">
+                        {{> "modules/house-rules/templates/party-sheet-cards.hbs" members=partyMembers}}
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</form>

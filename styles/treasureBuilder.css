@@ -1,0 +1,76 @@
+/* File: `styles/treasureBuilder.css` */
+
+/* General container styling */
+.treasure-builder-container {
+  padding: 15px;
+  font-family: Arial, sans-serif;
+  background: none;
+  color: #1a1a1a; /* Dark text for good readability on light backgrounds */
+}
+
+/* Table layout */
+.treasure-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 15px;
+}
+
+.treasure-table td {
+  padding: 5px;
+}
+
+/* Button styling */
+.treasure-button {
+  padding: 5px 10px;
+  font-size: 14px;
+  font-weight: normal;
+  border: 1px solid #666; /* Light border for visibility */
+  border-radius: 5px;
+  background: none;
+  color: #1a1a1a; /* Dark text for contrast */
+  cursor: pointer;
+}
+
+.treasure-button:hover {
+  border-color: #333; /* Darker border on hover */
+}
+
+/* Dropdown styling */
+select {
+  width: 100%;
+  padding: 5px;
+  font-size: 14px;
+  color: #1a1a1a; /* Dark text */
+  border: 1px solid #666;
+  border-radius: 5px;
+  background-color: #f9f9f9; /* Light background for dropdowns */
+}
+
+/* Action button area */
+.treasure-actions {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.create-lootable-npc {
+  font-weight: bold;
+}
+
+/* Tooltip styling */
+.treasure-button[title]::after {
+  content: attr(title);
+  position: absolute;
+  background-color: #333;
+  color: #f9f9f9;
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 12px;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.treasure-button:hover[title]::after {
+  visibility: visible;
+  opacity: 1;
+}

@@ -1,0 +1,137 @@
+{{#each members as |member|}}
+<div class="tracker-entry-bar">
+    <li class="entry actor" data-index="{{index}}" data-id="{{member.id}}" style="position: relative; list-style: none;">
+        <!-- Header Section with Table Layout -->
+        <table class="member-table">
+            <tr>
+                <!-- Portrait Cell -->
+                <td class="portrait-cell">
+                    <img class="token-image" src="{{member.img}}" data-tooltip="{{member.name}}" />
+                </td>
+                <!-- Name and Controls Cell -->
+                <td class="header-info-cell">
+                    <div class="member-base-controls">
+                        {{#if member.flags.world.henchman}}
+                        <i data-tooltip="Member is a henchman getting reduced experience awards" class="control henchman fas fa-user-check"></i>
+                        {{/if}}
+                        <a class="member-configure control" data-tooltip="Adjust henchman status"><i class="fas fa-cog"></i></a>
+                        <a class="member-longrest control" data-tooltip="Long rest for member"><i class="fas fa-campground"></i></a>
+                        <a class="member-remove control" data-tooltip="Remove party member"><i class="fas fa-minus"></i></a>
+                    </div>
+                    <a class="member">{{member.name}}</a>
+                </td>
+            </tr>
+        </table>
+
+        <!-- Main Information Section -->
+        <div class="info">
+            <div class="member-stats text-trunc">
+                {{member.system.classname}},
+                {{localize "ARS.armorclassabbr"}}: {{member.system.armorClass.normal}},
+                {{localize "ARS.hp"}}: {{member.system.attributes.hp.value}} / {{member.system.attributes.hp.max}},
+                {{localize "ARS.moveabbrv"}}: {{member.system.attributes.movement.value}} {{member.system.attributes.movement.unit}}
+            </div>
+
+            <div class="member-stats abilities text-trunc member-stats-wrapper more-stats">
+                {{localize "ARS.abilityTypes.strabbr"}}: <a data-ability="str">{{member.system.abilities.str.value}}</a>,
+                {{localize "ARS.abilityTypes.dexabbr"}}: <a data-ability="dex">{{member.system.abilities.dex.value}}</a>,
+                {{localize "ARS.abilityTypes.conabbr"}}: <a data-ability="con">{{member.system.abilities.con.value}}</a>,
+                {{localize "ARS.abilityTypes.intabbr"}}: <a data-ability="int">{{member.system.abilities.int.value}}</a>,
+                {{localize "ARS.abilityTypes.wisabbr"}}: <a data-ability="wis">{{member.system.abilities.wis.value}}</a>,
+                {{localize "ARS.abilityTypes.chaabbr"}}: <a data-ability="cha">{{member.system.abilities.cha.value}}</a>
+            </div>
+
+            <!-- Experience and Class Details -->
+            <div class="member-stats-wrapper more-stats">
+                {{#each member.classes as |item id|}}
+                {{#if item.system.active}}
+                <div class="flexrow member-stats-container">
+                    <div class="exp-bar-container">
+                        <div class="flexrow exp-bar">
+                            <div class="short-field"><img src="{{item.img}}" data-tooltip="{{item.name}}" width="19" height="19" /></div>
+                            <div id="progress-container"
+                                data-tooltip="{{item.name}} ({{item.classDetails.level}}) - Exp: {{item.system.xp}} / {{item.classDetails.neededxp}}%">
+                                <div id="progress-bar" style="{{progressBar item.system.xp item.classDetails.neededxp}}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{/if}}
+                {{/each}}
+            </div>
+
+            <!-- Health and Movement Bars -->
+            <div class="member-stats-wrapper">
+                <div class="flexrow member-stats-container">
+                    <!-- Health Bar -->
+                    <div class="health-bar-container">
+                        <div class="flexrow health-bar">
+                            HP:
+                            <div id="progress-container" data-tooltip="Health {{percentage member.system.attributes.hp.value member.system.attributes.hp.max}}%">
+                                <div id="progress-bar" style="{{progressBar member.system.attributes.hp.value member.system.attributes.hp.max}}"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Movement Bar -->
+                    <div class="move-bar-container">
+                        <div class="flexrow move-bar">
+                            MV:
+                            <div id="progress-container"
+                                data-tooltip="Movement at {{percentage member.movement member.system.attributes.movement.value}}% - Encumbrance Level: {{capfirst member.encumbrance}}">
+                                <div id="progress-bar" style="{{progressBar member.movement member.system.attributes.movement.value}}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Armor Damage Bar -->
+                {{#if (and ../armorDamage member.system.armorClass.armorDamage)}}
+                <div class="flexrow member-stats-container">
+                    <div class="armor-damage-container">
+                        <div class="flexrow armor-damage">
+                            AD:
+                            <div id="progress-container" data-tooltip="{{member.system.armorClass.armorDamageTooltip}}">
+                                <div id="progress-bar" style="{{progressBar member.system.armorClass.protectionPoints member.system.armorClass.protectionPointsMax}}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{/if}}
+            </div>
+
+            <!-- Provisions Section -->
+            <div class="more-stats">
+                <div class="flexrow member-stats-container">
+                    <div class="health-bar-container">
+                        RA:
+                        <div id="progress-container" data-tooltip="Rations {{percentage member.dailyprovisions.food.system.quantity 7}}%">
+                            <div id="progress-bar" style="{{progressBar member.dailyprovisions.food.system.quantity 7}}"></div>
+                        </div>
+                    </div>
+                    <div class="health-bar-container">
+                        WA:
+                        <div id="progress-container" data-tooltip="Water {{percentage member.dailyprovisions.water.system.quantity 7}}%">
+                            <div id="progress-bar" style="{{progressBar member.dailyprovisions.water.system.quantity 7}}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Psionic Strength Bars -->
+            {{#if (and member.isPsionic @root.game.ars.config.settings.usePsionics)}}
+            <div class="more-stats">
+                <div class="flexrow member-stats-container">
+                    <div class="health-bar-container">
+                        PS:
+                        <div id="progress-container" data-tooltip="Psionic Strength Score {{percentage member.system.psionics.psp.value member.system.psionics.psp.base}}%">
+                            <div id="progress-bar" style="{{progressBar member.system.psionics.psp.value member.system.psionics.psp.base}}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{/if}}
+        </div>
+    </li>
+</div>
+{{/each}}

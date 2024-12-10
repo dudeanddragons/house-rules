@@ -1,0 +1,100 @@
+{
+  "id": "house-rules",
+  "title": "House Rules",
+  "version": "1.0.0",
+  "compatibility": {
+    "minimum": "12",
+    "verified": "12"
+  },
+  "description": "Frank's House Rules",
+"esmodules": [
+    "scripts/attack-listener.js",
+    "scripts/critical-tables.js",
+    "scripts/treasureBuilder.js",
+    "scripts/spell-points.js",
+    "scripts/party-character.js",
+    "scripts/party-character-sheet.js",
+    "scripts/party-parts/members.js",
+    "scripts/party-parts/skills.js",
+    "scripts/party-parts/inventory.js",
+    "scripts/party-parts/watch-orders.js",
+    "scripts/party-parts/quests.js",
+    "scripts/party-parts/dm-notes.js",
+    "scripts/magicItems/items.Gems.js",
+    "scripts/magicItems/items.MArmor.js",
+    "scripts/magicItems/itemsArt.js",
+    "scripts/magicItems/itemsCurrency.js",
+    "scripts/magicItems/itemsMagicMisc.js",
+    "scripts/magicItems/itemsMWeapons.js",
+    "scripts/magicItems/itemsPotions.js",
+    "scripts/magicItems/itemsScrolls.js",
+    "scripts/magicItems/itemsWands.js",
+    "scripts/assetFolder.js"
+],
+  "templates": [
+    "templates/party-character.hbs",
+    "templates/party-sheet-cards.hbs",
+    "templates/treasureBuilder.hbs"
+  ],
+  "styles": [
+    "styles/party-character.css",
+    "styles/treasureBuilder.css"
+  ],
+  "packs": [
+    {
+      "name": "house-rules-items",
+      "label": "House Rules Items",
+      "path": "packs/house-rules-items",
+      "type": "Item",
+      "system": "ars",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "house-rules-journals",
+      "label": "House Rules Journals",
+      "path": "packs/house-rules-journals",
+      "type": "JournalEntry",
+      "system": "ars",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "house-rules-tables",
+      "label": "House Rules Tables",
+      "path": "packs/house-rules-tables",
+      "type": "RollTable",
+      "system": "ars",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "house-rules-macros",
+      "label": "House Rules Macros",
+      "path": "packs/house-rules-macros",
+      "type": "JournalEntry",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "system": "ars"
+    },
+    {
+      "name": "house-rules-actors",
+      "label": "House Rules Actors",
+      "path": "packs/house-rules-actors",
+      "type": "Actor",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "system": "ars"
+    }
+  ]
+}

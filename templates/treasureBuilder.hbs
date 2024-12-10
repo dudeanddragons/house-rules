@@ -1,0 +1,67 @@
+<!-- File: `templates/treasureBuilder.hbs` -->
+
+<div class="treasure-builder-container">
+  <h2>Treasure Builder</h2>
+
+  <div class="item-selection">
+    <button class="random-item-button treasure-button" title="Select a Random Item Type">
+      <i class="fas fa-dice"></i> Random Item Type
+    </button>
+    <select id="item-type-selector" title="Select Item Type">
+      <option value="">Select an Item Type</option>
+      {{#each itemTypes}}
+        <option value="{{this}}">{{this}}</option>
+      {{/each}}
+    </select>
+  </div>
+
+  <div class="item-options-container"></div>
+
+    <button class="store-item-button treasure-button" title="Store Generated Item">
+      <i class="fas fa-box"></i> Store Item
+    </button>
+  </div>
+
+  <div class="stored-items">
+    <h3>Stored Items for NPC</h3>
+    <table class="stored-items-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Level</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each storedItems}}
+          <tr>
+            <td>{{this.name}}</td>
+            <td>{{this.type}}</td>
+            <td>{{this.level}}</td>
+            <td>
+              <button class="delete-item-button" data-item-id="{{this.id}}" title="Delete Item">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr>
+        {{else}}
+          <tr>
+            <td colspan="4">No items stored.</td>
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="generate-item">
+    <button class="generate-item-button treasure-button" title="Generate Item">
+      <i class="fas fa-hammer"></i> Generate Item
+    </button>
+
+  <div class="treasure-actions">
+    <button class="create-lootable-npc treasure-button" title="Create Lootable NPC">
+      <i class="fas fa-user"></i> Create NPC
+    </button>
+  </div>
+</div>
