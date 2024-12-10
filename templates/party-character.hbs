@@ -210,39 +210,139 @@
                 </ul>
             </div>
 
-<!-- Debug partyInventory -->
-{{log "partyInventory data:" partyInventory}}
-
-<!-- Inventory Tab -->
 <div class="tab-content inventory" data-tab="inventory" style="display: none;">
+
+    <!-- Currency Section -->
+    <div class="general-subheader flexrow currency-header">
+        <div data-tooltip="Total Copper currency items carried by actor">Copper</div>
+        <div data-tooltip="Total Silver currency items carried by actor">Silver</div>
+        <div data-tooltip="Total Electrum currency items carried by actor">Electrum</div>
+        <div data-tooltip="Total Gold currency items carried by actor">Gold</div>
+        <div data-tooltip="Total Platinum currency items carried by actor">Platinum</div>
+    </div>
+<!-- Currency Values -->
+<div class="currency container-border flexrow">
+    <div class="flexrow">
+        <div class="coin-value centered">
+            <label>{{currency.cp}}</label>
+        </div>
+    </div>
+    <div class="flexrow">
+        <div class="coin-value centered">
+            <label>{{currency.sp}}</label>
+        </div>
+    </div>
+    <div class="flexrow">
+        <div class="coin-value centered">
+            <label>{{currency.ep}}</label>
+        </div>
+    </div>
+    <div class="flexrow">
+        <div class="coin-value centered">
+            <label>{{currency.gp}}</label>
+        </div>
+    </div>
+    <div class="flexrow">
+        <div class="coin-value centered">
+            <label>{{currency.pp}}</label>
+        </div>
+    </div>
+</div>
+
     <h2>Inventory</h2>
-    <div class="inventory-wrapper">
-        {{#if partyInventory.length}}
+    <div class="item-list inventory">
+        <!-- Header Row -->
+        <div class="general-subheader flexrow" style="align-items: center;">
+            <div class="short-field"></div>
+            <div class="item-name-details flexrow">
+                <div>
+                    <div class="item-name">Name</div>
+                </div>
+                <div class="item-location">
+                    <div data-tooltip="Click carried state icon to change">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="item-boolean" data-tooltip="Magic">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <div class="item-boolean" data-tooltip="Identification">
+                <i class="fas fa-eye"></i>
+            </div>
+            <div class="medium-field"><i class="fas fa-hashtag"></i></div>
+            <div class="medium-field"><i class="fas fa-weight-hanging"></i></div>
+            <div class="item-context-controls" data-tooltip="Modify">
+                <i class="fa fa-gears"></i>
+            </div>
+        </div>
+
+        <!-- Inventory Items -->
         <ul class="inventory-list">
             {{#each partyInventory}}
-            <li class="item item-entry flexrow reveal-hidden" data-id="{{id}}" data-name="{{name}}" data-type="{{type}}">
+            <li class="item item-entry flexrow reveal-hidden quantityNonZero" 
+                data-id="{{id}}" 
+                data-item-id="{{id}}" 
+                data-magic="{{isMagic}}" 
+                data-identified="{{isIdentified}}" 
+                data-location="{{location}}" 
+                data-name="{{name}}" 
+                data-type="{{type}}" 
+                data-uuid="{{uuid}}" 
+                draggable="true">
+                
+                <!-- Item Image -->
                 <div class="item-image">
-                    <img src="{{img}}" alt="{{name}}" title="{{name}}" />
+                    <img src="{{img}}" data-tooltip="{{name}}">
                 </div>
-                <div class="item-details">
-                    <strong class="item-name">{{name}}</strong>
-                    <span class="item-quantity">(Quantity: {{quantity}})</span>
-                    <span class="item-weight">Weight: {{weight}}</span>
-                    {{#if isEquipped}}
-                    <span class="item-equipped">(Equipped)</span>
-                    {{/if}}
-                    {{#if (not isIdentified)}}
-                    <span class="item-unidentified">(Unidentified)</span>
-                    {{/if}}
+                
+                <!-- Item Details -->
+                <div class="flexrow">
+                    <div class="item-name text-trunc item-preview">
+                        <h4>
+                            <div class="inventory-item-name">{{name}}</div>
+                        </h4>
+                    </div>
+                    <div class="item-location">
+                        <div class="item-location-controls">
+                            <i class="fas fa-box"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Magic Icon -->
+                <div class="item-show-magic item-boolean">
+                    <a class="item-magic">
+                        <i class="{{#if isMagic}}fa-solid fa-wand-magic-sparkles{{else}}far fa-circle{{/if}}"></i>
+                    </a>
+                </div>
+                
+                <!-- Identified Icon -->
+                <div class="item-show-identified item-boolean">
+                    <a class="item-identified">
+                        <i style="color:{{#if isIdentified}}green{{else}}red{{/if}}" class="{{#if isIdentified}}fa fa-check-circle{{else}}fa fa-question-circle{{/if}}"></i>
+                    </a>
+                </div>
+                
+                <!-- Quantity -->
+                <div class="item-quantity-control medium-field" data-tooltip="{{quantity}}">
+                    {{quantity}}
+                </div>
+                
+                <!-- Weight -->
+                <div data-tooltip="{{weight}}" class="medium-field">
+                    {{weight}}
+                </div>
+                
+                <!-- Context Menu -->
+                <div class="item-context-controls">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>
                 </div>
             </li>
             {{else}}
-            <li>No items in inventory.</li>
+            <li>No items found in inventory.</li>
             {{/each}}
         </ul>
-        {{else}}
-        <p>No items found in party inventory.</p>
-        {{/if}}
     </div>
 </div>
 

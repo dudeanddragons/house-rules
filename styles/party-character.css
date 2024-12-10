@@ -146,6 +146,20 @@
     padding: 5px;
 }
 
+.currency.container-border .coin-value {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%; /* Ensures consistency across the flex items */
+}
+
+.currency.container-border .coin-value label {
+    font-size: 1.2em; /* Adjust font size as needed */
+    font-weight: bold; /* Optional: make the numbers bold for better visibility */
+}
+
+
 /* Quests Tab Styling */
 .tab-content.quests {
     padding: 10px;

@@ -78,6 +78,18 @@ async getData() {
             };
         });
 
+        // Fetch currency for the party character actor
+        const currency = {
+            cp: this.actor.currency?.cp || 0,
+            sp: this.actor.currency?.sp || 0,
+            ep: this.actor.currency?.ep || 0,
+            gp: this.actor.currency?.gp || 0,
+            pp: this.actor.currency?.pp || 0,
+        };
+
+        // Assign currency to data object
+        data.currency = currency;
+
         // Fetch and prepare Party Inventory data for the Party Character Actor only
         const inventory = this.actor.items.map(item => ({
             id: item.id,
