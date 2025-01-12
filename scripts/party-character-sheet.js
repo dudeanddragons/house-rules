@@ -8,6 +8,8 @@ import { WatchOrders } from './party-parts/watch-orders.js';
 import { Quests } from './party-parts/quests.js';
 import { DMNotes } from './party-parts/dm-notes.js';
 
+
+
 // Register partials manually
 Hooks.once('init', () => {
     loadTemplates([
@@ -127,6 +129,7 @@ prepareInventory(inventory) {
     }));
 }
 
+
 /** @override */
 activateListeners(html) {
     super.activateListeners(html);
@@ -184,12 +187,77 @@ activateListeners(html) {
         console.log(`Updated marching order for actor ID: ${actorId} - Marching Order: ${marchingOrder}`);
     });
 
+        // #region controls
+
+        let actor = this.actor,
+            dragLinks = html.find('#drag-link'),
+            btnCreateSpellLists = html.find('.createspelllist-button'),
+            btnCreateActionLists = html.find('.createactions-button'),
+            btnRandomSpellListPopulation = html.find('.memslot-random-populate-control'),
+            invItems = html.find('li.item'),
+            invLootCoins = html.find('li.coin-loot'),
+            btnLongrest = html.find('.actor-longrest'),
+            btnInit = html.find('.roll-initiative'),
+            btnApplyExp = html.find('button.apply-experience'),
+            revealHidden = html.find('.reveal-hidden'),
+            btnItemEdit = html.find('.item-edit'),
+            btnProfMissing = html.find('.click-prof-missing'),
+            btnProvisionsEdit = html.find('.item-provisions-edit'),
+            btnProvisionsDelete = html.find('.item-provisions-delete'),
+            btnProvisionsSelect = html.find('.item-provisions-select'),
+            btnItemPreview = html.find('.item-preview'),
+            btnItemView = html.find('.item-view'),
+            btnItemDelete = html.find('.item-delete'),
+            btnAbilityCheck = html.find('.ability-check'),
+            btnAbilitySkillCheck = html.find('.ability-skill-check'), // todo: comma seperated different keys for different variants,
+            btnSaveCheck = html.find('.save-check'),
+            btnSpellCardRoll = html.find('.spellCard-roll'),
+            btnChatCardRoll = html.find('.chatCard-roll'),
+            // btnActionCardRoll = html.find('.actionCard-roll'),
+            btnActionCardRoll = html.find('.actionCard-roll-V2'),
+            btnEffectControl = html.find('.effect-control'),
+            btnMemorizationControls = html.find('.memorization-controls'),
+            btnMemspellSelect = html.find('.memspell-select'),
+            // actionSheetBlock = html.find('.action-sheet-block'),
+            // btnActionControls = html.find('.action-controls'),
+            btnActionControlsV2 = html.find('.action-controlsV2'),
+            btnActionGroupControlsV2 = html.find('.action-group-controlsV2'),
+            btnActionToggleView = html.find('.action-toggle-view'),
+            btnClassControl = html.find('.class-control'),
+            btnWeaponMetalControls = html.find('.weapon-metal-controls'),
+            // btnItemLocationControls = html.find('.item-location-controls'),
+            btnItemImage = html.find('.item-image'),
+            btnCloneCovertActor = html.find('.clone-covert-actor'),
+            btnGeneralPropertiesControls = html.find('.general-properties-controls'),
+            searchControls = html.find('.pnl_search_controls'),
+            selFilter = html.find('.sel_inventory_filter'),
+            txtSearch = html.find('.txt_inventory_search'),
+            btnToggleSearchControls = html.find('.btn_toggle_search'),
+            btnCollapsible = html.find('.ars_clps'),
+            btnSyncOwnedSpells = html.find('.sync-owned-spells'),
+            btnSyncOwnedPowers = html.find('.sync-owned-powers'),
+            btnToggleItemMagic = html.find('.item-show-magic'),
+            btnToggleItemIdentified = html.find('.item-show-identified'),
+            btnItemQuantity = html.find('.item-quantity-control'),
+            btnCharacterBrowserDirector = html.find('.character-browser-director'),
+            btnCreateItem = html.find('.item-create'),
+            btnLearnMagic = html.find('.btn-learn-magic'),
+            itemBulkSelect = html.find('.item-image'),
+            btnSelectAll = html.find('.btn_select_all'),
+            btnToggleExpand = html.find('.btn_expand_all'),
+            psiInputs = html.find('.psi-inputs, .psp-points-value'),
+            btnResetClosedMind = html.find('.reset-closed-mind');
+
+            // delete item button
+            btnItemDelete.click((event) => this._confirmItemDelete(event));
+
     // Add listeners for marching order buttons
     html.find(".marching-order-style").on("click", async (event) => {
         const formation = $(event.currentTarget).data("style");
         console.log(`Marching Order | Selected formation: ${formation}`);
         await this._dropMarchingOrder(formation);
     });
+
 
     html.find(".direction-button[data-direction='N']").on("click", () => {
         this.selectedDirection = "N";
@@ -253,38 +321,47 @@ activateListeners(html) {
         console.log(`Activating formation: ${formation} with direction: ${direction}`);
         await this._dropMarchingOrder(formation, direction);
     });
+            //modify owned items context menu
+            html.find('.item-context-controls').click((event) => {
+                const li = $(event.currentTarget).closest('.item');
+                const item = this.actor.items.get(li.data('itemId'));
+                this._openItemModifyContextMenu(event, item);
+            });
+    
+
 
 
 
 
 
-    
-    html.find(".item").on("dragstart", (event) => {
-        const li = event.currentTarget;
-        const itemId = li.dataset.id;
-        const item = this.actor.items.get(itemId);
-    
-        if (!item) {
-            console.error("PartyCharacterSheet | Item not found for drag:", itemId);
-            return;
-        }
-    
-        // Prepare drag data
-        const dragData = {
-            type: "Item",
-            id: item.id,
-            uuid: item.uuid, // Ensure ARS has access to the UUID
-            actorId: this.actor.id,
-            sourceUuid: this.actor.uuid, // Add the source actor's UUID
-        };
-    
-        event.originalEvent.dataTransfer.setData("text/plain", JSON.stringify(dragData));
-        console.log("PartyCharacterSheet | Dragging item:", dragData);
-    });
-    
-    
 
+
+    /**
+ * Initialize dragstart for inventory items.
+ */
+html.find(".item").on("dragstart", (event) => {
+    const li = event.currentTarget;
+    const itemId = li.dataset.id; // Ensure this matches your item ID attribute
+    const item = this.actor.items.get(itemId);
+
+    if (!item) {
+        console.error("PartyCharacterSheet | Item not found for drag:", itemId);
+        return;
+    }
+
+    // Prepare drag data
+    const dragData = {
+        type: "Item",
+        id: item.id, // Item ID being dragged
+        actorId: this.actor.id, // Source actor's ID
+        uuid: item.uuid, // Use the item's UUID, not the actor's
+    };
+
+    event.originalEvent.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+    console.log("PartyCharacterSheet | Dragging item:", dragData);
+});
 }
+
 
 /**
  * Initialize drag-and-drop functionality.
@@ -302,146 +379,434 @@ _activateDragDrop(html) {
 }
 
 
-
-/**
- * Handle the onDrop logic with data types.
- * @param {DragEvent} event - The drag event.
- * @param {Object} data - The data associated with the drag.
- */
-async _handleOnDrop(event, data) {
-    console.log("PartyCharacterSheet | Handling drop event", { event, data });
-
-    if (!data) {
-        console.error("PartyCharacterSheet | Drop data is undefined.");
-        return ui.notifications.error("Invalid drop data. Please try again.");
-    }
-
-    // Determine data type and process accordingly
-    const type = data.type || (data.items && data.items[0]?.type);
-
-    if (!type) {
-        console.error("PartyCharacterSheet | Drop type is undefined:", data);
-        return ui.notifications.error("Unsupported drop type.");
-    }
-
-    switch (type) {
-        case "Item":
-            return this._onDropItem(event, data);
-        default:
-            console.warn("Unsupported drop type:", type);
-            break;
-    }
-}
-
 /**
  * Handle dropped items specifically for the inventory.
- * Supports ARS-like data structure for cross-actor interaction.
  * @param {DragEvent} event - The drag event.
  * @param {Object} data - The data associated with the dropped item.
  */
 async _onDropItem(event, data) {
     console.log("PartyCharacterSheet | Dropping item data:", data);
 
-    let item;
-    try {
-        // Support ARS-style drag data structure
-        if (data.uuid) {
-            item = await fromUuid(data.uuid);
-        } else if (data.id && data.actorId) {
-            const sourceActor = game.actors.get(data.actorId);
-            item = sourceActor ? sourceActor.items.get(data.id) : null;
-        }
+    // Validate drop data
+    if (!data.uuid) {
+        console.error("PartyCharacterSheet | Drop data does not include a valid UUID:", data);
+        return ui.notifications.error("Invalid drop data.");
+    }
 
-        if (!item) {
-            console.error("PartyCharacterSheet | Item not found in drop data:", data);
-            return ui.notifications.error("Item not found.");
-        }
-    } catch (err) {
-        console.error("PartyCharacterSheet | Failed to resolve item from drop data:", err);
+    // Fetch the dropped item from UUID
+    const item = await fromUuid(data.uuid);
+    if (!item) {
+        console.error("PartyCharacterSheet | Item not found from UUID:", data.uuid);
         return;
     }
 
-    // Determine target actor
+    // Fetch source and target actors
+    const sourceActor = game.actors.get(data.actorId);
     const targetActor = this.actor;
 
-    if (!targetActor) {
-        console.error("PartyCharacterSheet | Target actor not found.");
-        return ui.notifications.error("Target actor not found.");
-    }
-
-    // Clone the item to the target actor
-    const newItem = await targetActor.createEmbeddedDocuments("Item", [item.toObject()]);
-    if (newItem) {
-        ui.notifications.info(`Added "${item.name}" to ${targetActor.name}.`);
-        console.log("PartyCharacterSheet | Item added to target actor:", newItem);
-
-        // Optionally remove the item from the source actor (if ARS logic is followed)
-        if (data.actorId && data.actorId !== targetActor.id) {
-            const sourceActor = game.actors.get(data.actorId);
-            if (sourceActor) {
-                await sourceActor.deleteEmbeddedDocuments("Item", [item.id]);
-                console.log(`PartyCharacterSheet | Removed "${item.name}" from source actor.`);
-            }
-        }
-    } else {
-        ui.notifications.error("Failed to add item to target inventory.");
-    }
-}
-
-
-
-
-
-/**
- * Handle dropped actors.
- * @param {DragEvent} event - The drag event.
- * @param {Object} data - The data associated with the dropped actor.
- */
-async _onDropActor(event, data) {
-    console.log("PartyCharacterSheet | Dropping actor data:", data);
-
-    const actor = await Actor.implementation.fromDropData(data);
-
-    if (!actor) {
-        console.error("PartyCharacterSheet | Dropped actor could not be resolved.");
+    if (!sourceActor || !targetActor) {
+        console.error("PartyCharacterSheet | Source or target actor not found.");
         return;
     }
 
-    ui.notifications.info(`Actor "${actor.name}" dropped onto the Party Character Sheet.`);
-    console.log(`PartyCharacterSheet | Actor dropped:`, actor);
+    console.log(`PartyCharacterSheet | Source Actor: ${sourceActor.name}, Target Actor: ${targetActor.name}`);
+    console.log(`PartyCharacterSheet | Dropped item:`, item);
+
+    // Locate the source item in the prepared inventory
+    const sourceInventoryItem = sourceActor.items.find(i => i.id === item.id);
+    if (!sourceInventoryItem) {
+        console.error("PartyCharacterSheet | Source item not found in inventory:", item.id);
+        return;
+    }
+
+    // Prompt for transfer quantity if item is stackable
+    let transferQuantity = 1;
+    if (sourceInventoryItem.system?.quantity > 1) {
+        transferQuantity = await new Promise((resolve) => {
+            new Dialog({
+                title: `Transfer Quantity: ${sourceInventoryItem.name}`,
+                content: `<p>Enter quantity to transfer:</p>
+                          <input type="number" min="1" max="${sourceInventoryItem.system.quantity}" value="1" style="width:100%">`,
+                buttons: {
+                    ok: {
+                        label: "Transfer",
+                        callback: (html) => resolve(parseInt(html.find('input').val(), 10) || 1),
+                    },
+                    cancel: {
+                        label: "Cancel",
+                        callback: () => resolve(null),
+                    },
+                },
+                default: "ok",
+            }).render(true);
+        });
+
+        if (!transferQuantity) {
+            console.log("PartyCharacterSheet | Transfer canceled by user.");
+            return;
+        }
+    }
+
+    // Clone the item to the target actor with the specified quantity
+    const newItemData = {
+        ...item.toObject(),
+        system: { ...item.system, quantity: transferQuantity },
+    };
+    await targetActor.createEmbeddedDocuments("Item", [newItemData]);
+
+    // Adjust the quantity or remove the item from the source actor
+    const remainingQuantity = sourceInventoryItem.system.quantity - transferQuantity;
+
+    if (remainingQuantity > 0) {
+        // Update the source item's quantity
+        try {
+            console.log(`PartyCharacterSheet | Updating ${sourceInventoryItem.name} quantity on ${sourceActor.name}: ${remainingQuantity}`);
+            await sourceActor.updateEmbeddedDocuments("Item", [
+                { _id: sourceInventoryItem.id, "system.quantity": remainingQuantity },
+            ]);
+        } catch (error) {
+            console.error("PartyCharacterSheet | Failed to update quantity on source actor:", error);
+        }
+    } else {
+        // Delete the item if quantity reaches zero
+        try {
+            console.log(`PartyCharacterSheet | Removing ${sourceInventoryItem.name} from ${sourceActor.name} (quantity 0).`);
+            await sourceActor.deleteEmbeddedDocuments("Item", [sourceInventoryItem.id]);
+        } catch (error) {
+            console.error("PartyCharacterSheet | Failed to delete item from source actor:", error);
+        }
+    }
+
+    ui.notifications.info(`Transferred ${transferQuantity}x ${item.name} to ${targetActor.name}.`);
+}
+
+
+//--------------------------------------------------------------//
+//
+//From ARS
+//
+//
+/**
+     *  toggle item magic state
+     * @param {*} event
+     * @returns
+     */
+async #toggleItemMagic(event) {
+    if (!game.user.isGM) return;
+    const li = $(event.currentTarget).closest('.item');
+    const item = this.actor.items.get(li.data('itemId'));
+    const oldValue = item.system.attributes.magic;
+    if (await dialogManager.confirm(`Toggle magic state for ${item.name}?`, 'Toggle Magic'))
+        item.update({ 'system.attributes.magic': !oldValue });
 }
 
 /**
- * Handle dropped folders (if applicable).
- * @param {DragEvent} event - The drag event.
- * @param {Object} data - The data associated with the dropped folder.
+ * toggle item identified state
+ * @param {*} event
+ * @returns
  */
-async _onDropFolder(event, data) {
-    console.warn("PartyCharacterSheet | Folder drops are not implemented.");
-    ui.notifications.warn("Folder drops are not supported on the Party Character Sheet.");
+async #toggleItemIdentification(event) {
+    if (!game.user.isGM) return;
+    const li = $(event.currentTarget).closest('.item');
+    const item = this.actor.items.get(li.data('itemId'));
+    const oldValue = item.system.attributes.identified;
+    if (await dialogManager.confirm(`Toggle identified state for ${item.name}?`, 'Toggle Magic'))
+        item.update({ 'system.attributes.identified': !oldValue });
 }
 
 /**
- * Handle dropped active effects (if applicable).
- * @param {DragEvent} event - The drag event.
- * @param {Object} data - The data associated with the dropped effect.
+ * set item quantity value
+ * @param {*} event
+ * @returns
  */
-async _onDropActiveEffect(event, data) {
-    console.warn("PartyCharacterSheet | Active Effect drops are not implemented.");
-    ui.notifications.warn("Active Effect drops are not supported on the Party Character Sheet.");
+async #setItemQuantity(event) {
+    const li = $(event.currentTarget).closest('.item');
+    const item = this.actor.items.get(li.data('itemId'));
+    const oldValue = item.system.quantity;
+    const newValue = await dialogManager.getQuantity(
+        0,
+        Infinity,
+        oldValue,
+        `New Quantity`,
+        `Quantity for ${item.name}`,
+        'Update',
+        'Cancel'
+    );
+    if (newValue == undefined) return;
+    item.update({ 'system.quantity': newValue });
+    console.warn(
+        `${game.user.name} changed quantity of ${item.name} from ${oldValue} to ${newValue} on ${item.actor.name}`,
+        {
+            item,
+        }
+    );
+}
+/**
+ *
+ * Context menu to modify items owned by actor
+ *
+ * @param {*} event
+ * @param {*} item
+ */
+_openItemModifyContextMenu(event, item) {
+    if (!item) return;
+    // Generate the HTML for the context menu using divs
+    let menuHtml = `
+        <div class="modify-context-menu">
+            <div class="action" data-action="edit"><i class="fas fa-edit"></i> Edit</div>
+            <div class="action" data-action="delete"><i class="fas fa-trash"></i> Delete</div>
+            <div class="action" data-action="duplicate"><i class="fas fa-copy"></i> Duplicate</div>
+            ${
+                item.system.quantity > 1
+                    ? '<div class="action" data-action="split"><i class="fa-solid fa-arrows-left-right"></i> Split</div>'
+                    : ''
+            }
+            <div class="action" data-action="cancel"><i class='fa-solid fa-circle-xmark'></i></i> Cancel</div>                
+        </div>
+    `;
+
+    let menu = $(menuHtml).appendTo(document.body);
+
+    // Position the menu at the event's pageX and pageY slightly adjusted to make sure
+    // mouse is inside the context menu
+    menu.css({
+        top: `${event.clientY - 15}px`,
+        left: `${event.clientX - 15}px`,
+    });
+
+    // Handle clicks on the menu options
+    menu.on('click', 'div[data-action]', async (e) => {
+        const action = $(e.target).closest('div[data-action]').data('action');
+        switch (action) {
+            case 'edit':
+                item.sheet.render(true);
+                break;
+            case 'delete':
+                if (
+                    await dialogManager.confirm(
+                        `<b>Delete ${item?.name} ${
+                            item?.system?.itemList?.length ? ' (and its contents)' : ''
+                        }</b><p/>Are you sure?`,
+                        'Confirm Delete'
+                    )
+                ) {
+                    // ! bulk selection support
+                    if (window.bulkItemSelection?.length) {
+                        for (const itemId of window.bulkItemSelection) {
+                            try {
+                                await this.actor.deleteEmbeddedDocuments('Item', [itemId]);
+                            } catch (e) {}
+                        }
+                    } else {
+                        this.actor.deleteEmbeddedDocuments('Item', [item.id]);
+                    }
+                }
+
+                break;
+            case 'duplicate':
+                if (item.contains) {
+                    ui.notifications.error(`${item.name} contains items and cannot be duplicated.`);
+                } else if (
+                    await dialogManager.confirm(
+                        `<b>Duplicate ${item?.name} ${
+                            item?.system?.itemList?.length ? ' (and its contents)' : ''
+                        }</b><p/>Are you sure?`,
+                        'Confirm Duplication'
+                    )
+                ) {
+                    item.clone({}, { save: true }).then((duplicated) =>
+                        console.log(`${this.actor.name} duplicated item ${duplicated.name}`)
+                    );
+                }
+                break;
+            case 'split':
+                {
+                    // dialog to get amount to split
+                    const count = await dialogManager.getQuantity(
+                        0,
+                        item.system.quantity,
+                        1,
+                        `Split ${item.name} by how much?`,
+                        'Split Item',
+                        'Split',
+                        'Cancel'
+                    );
+                    if (count > 0) {
+                        if (count >= item.system.quantity) {
+                            ui.notifications.error(`There are only ${item.system.quantity}`);
+                        } else {
+                            const itemData = item.toObject();
+                            const leftOver = item.system.quantity - count;
+                            itemData.system.quantity = count;
+                            if (leftOver > 0) {
+                                item.update({
+                                    'system.quantity': item.system.quantity - count,
+                                });
+                            } else {
+                                this.actor.deleteEmbeddedDocuments('Item', [item.id]);
+                            }
+                            this.actor.createEmbeddedDocuments('Item', [itemData]);
+                        }
+                    }
+                }
+                break;
+            case 'cancel':
+                menu.remove();
+                break;
+        }
+        menu.remove(); // Remove the menu after an action is selected
+    });
+
+    // Use 'mouseleave' event to remove the menu when the mouse leaves the menu area
+    menu.on('mouseleave', () => {
+        menu.remove();
+    });
+}
+/**
+ *
+ * Context menu to select specific item location, nocarried, carried, equipped
+ *
+ * @param {*} event
+ * @param {*} item
+ * @returns
+ */
+_openItemLocationContextMenu(event, item) {
+    if (!item) return;
+    // Generate the HTML for the context menu using divs
+    let menuHtml = `
+        <div class="modify-context-menu">
+            <div class="action" data-action="notcarried"><i class="fas fa-exclamation-circle"></i> Not-Carried</div>
+            <div class="action" data-action="carried"><i class="fas fa-box"></i> Carried</div>
+            <div class="action" data-action="equipped"><i class="fas fa-shield-halved"></i> Equipped</div>
+            <div class="action" data-action="cancel"><i class='fa-solid fa-circle-xmark'></i></i> Cancel</div>                
+        </div>
+    `;
+
+    let menu = $(menuHtml).appendTo(document.body);
+
+    // Position the menu at the event's pageX and pageY slightly adjusted to make sure
+    // mouse is inside the context menu
+    menu.css({
+        top: `${event.clientY + 5}px`,
+        left: `${event.clientX + 10}px`,
+    });
+
+    // Handle clicks on the menu options
+    menu.on('click', 'div[data-action]', async (e) => {
+        const action = $(e.target).closest('div[data-action]').data('action');
+        const currentLocationState = item.system.location.state;
+        switch (action) {
+            case 'notcarried':
+                if (currentLocationState !== 'nocarried') await item.update({ 'system.location.state': 'nocarried' });
+                break;
+            case 'carried':
+                if (currentLocationState !== 'carried') await item.update({ 'system.location.state': 'carried' });
+                break;
+            case 'equipped':
+                if (currentLocationState !== 'equipped') await item.update({ 'system.location.state': 'equipped' });
+                break;
+            case 'cancel':
+                menu.remove();
+                break;
+        }
+        menu.remove(); // Remove the menu after an action is selected
+    });
+
+    // Use 'mouseleave' event to remove the menu when the mouse leaves the menu area
+    menu.on('mouseleave', () => {
+        menu.remove();
+    });
 }
 
+/**
+ * Initialize collapsables
+ */
+initializeCollapseables(html) {
+    // initialize containers
+    const listContainers = html[0].querySelectorAll('.container-collapse');
+    listContainers.forEach((item) => {
+        const containerId = item.getAttribute('data-container-id');
+        const containerKey = containerId;
+        this.toggleInventoryCollapseable(html, containerKey, true);
+    });
+}
 
+/**
+ *
+ * toggle collapsing containers and store state in localStorage
+ *
+ * @param {*} html
+ * @param {*} localKey
+ * @param {*} skipSet
+ * @returns
+ */
+toggleInventoryCollapseable(html, localKey, skipSet = false) {
+    const id = this.actor.id;
+    const saveKey = `${id}-${localKey}}`;
 
+    const expandElem = html.find(`#inventory-container-expand-${localKey}`)[0];
 
+    const iconElem = html.find(`#inventory-container-icon-${localKey}`)[0];
 
+    // container with nothing in it
+    if (!iconElem) return;
 
+    const localStorageData = localStorage.getItem(saveKey);
+    let isCollapsed = localStorageData === 'true' || localStorageData === undefined || localStorageData === null;
 
+    if (!skipSet) localStorage.setItem(saveKey, !isCollapsed);
+    const currentCollapsed = skipSet ? isCollapsed : !isCollapsed;
+    if (currentCollapsed) {
+        iconElem.classList?.remove('fa-caret-down');
+        iconElem.classList.add('fa-caret-right');
+        expandElem.style.display = 'none';
+    } else {
+        iconElem.classList?.remove('fa-caret-right');
+        iconElem.classList.add('fa-caret-down');
+        expandElem.style.display = 'block';
+    }
+}
 
+    /**
+     * Confirm a click to delete item
+     * @param {Event} event
+     */
+    async _confirmItemDelete(event) {
+        // console.log("actor-sheet.js", "_confirmItemDelete");
+        const li = $(event.currentTarget).parents('.item');
+        const item = this.actor.getEmbeddedDocument('Item', li.data('id'));
+        if (
+            await dialogManager.confirm(
+                `<b>Delete ${item?.name} ${item?.system?.itemList?.length ? ' (and its contents)' : ''}</b><p/>Are you sure?`,
+                'Confirm Delete'
+            )
+        ) {
+            if (window.bulkItemSelection?.length) {
+                for (const itemId of window.bulkItemSelection) {
+                    try {
+                        await this.actor.deleteEmbeddedDocuments('Item', [itemId]);
+                    } catch (e) {}
+                }
+            } else {
+                this.actor.deleteEmbeddedDocuments('Item', [li.data('id')]);
+            }
+        }
+    }
 
+    /**
+     * Handle deleting of items
+     * @param {Event} event
+     */
+    _onItemDelete(event) {
+        const li = $(event.currentTarget).parents('.item');
+        // console.log("actor-sheet.js _onItemDelete", { li });
+        // console.log("actor-sheet.js _onItemDelete li.data(id)", li.data("id"));
+        this.actor.deleteEmbeddedDocuments('Item', [li.data('id')]);
+        li.slideUp(200, () => this.render(false));
+    }
+//---------------------------------end-------------------------------//
 
-
-
+    
 
 
 /**

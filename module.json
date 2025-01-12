@@ -1,7 +1,7 @@
 {
   "id": "house-rules",
   "title": "House Rules",
-  "version": "12.241209.02",
+  "version": "12.25.01.11.01",
   "compatibility": {
     "minimum": "12",
     "verified": "12"
@@ -11,7 +11,6 @@
     "scripts/attack-listener.js",
     "scripts/critical-tables.js",
     "scripts/treasureBuilder.js",
-    "scripts/spell-points.js",
     "scripts/party-character.js",
     "scripts/party-character-sheet.js",
     "scripts/party-parts/members.js",
@@ -30,11 +29,6 @@
     "scripts/magicItems/itemsScrolls.js",
     "scripts/magicItems/itemsWands.js",
     "scripts/assetFolder.js"
-  ],
-  "templates": [
-    "templates/party-character.hbs",
-    "templates/party-sheet-cards.hbs",
-    "templates/treasureBuilder.hbs"
   ],
   "styles": [
     "styles/party-character.css",
@@ -78,25 +72,25 @@
       "name": "house-rules-macros",
       "label": "House Rules Macros",
       "path": "packs/house-rules-macros",
-      "type": "JournalEntry",
+      "type": "Macro",
+      "system": "ars",
       "ownership": {
         "PLAYER": "OBSERVER",
         "ASSISTANT": "OWNER"
-      },
-      "system": "ars"
+      }
     },
     {
       "name": "house-rules-actors",
       "label": "House Rules Actors",
       "path": "packs/house-rules-actors",
       "type": "Actor",
+      "system": "ars",
       "ownership": {
         "PLAYER": "OBSERVER",
         "ASSISTANT": "OWNER"
-      },
-      "system": "ars"
+      }
     }
   ],
   "manifest": "https://raw.githubusercontent.com/dudeanddragons/house-rules/refs/heads/master/module.json",
-  "download": "https://github.com/dudeanddragons/house-rules/releases/tag/12.241209.02.zip"
+  "download": "https://github.com/dudeanddragons/house-rules/releases/tag/12.25.01.11.01.zip"
 }
