@@ -92,5 +92,5 @@
     }
   ],
   "manifest": "https://raw.githubusercontent.com/dudeanddragons/house-rules/refs/heads/master/module.json",
-  "download": "https://github.com/dudeanddragons/house-rules/releases/tag/12.25.01.11.01.zip"
+  "download": "https://github.com/dudeanddragons/house-rules/archive/refs/tags/12.25.01.11.01.zip"
 }
