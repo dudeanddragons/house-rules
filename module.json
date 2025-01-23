@@ -1,7 +1,7 @@
 {
   "id": "house-rules",
   "title": "House Rules",
-  "version": "12.25.01.11.02",
+  "version": "12.25.01.22.01",
   "compatibility": {
     "minimum": "12",
     "verified": "12"
@@ -9,7 +9,6 @@
   "description": "Frank's House Rules",
   "esmodules": [
     "scripts/attack-listener.js",
-    "scripts/critical-tables.js",
     "scripts/treasureBuilder.js",
     "scripts/party-character.js",
     "scripts/party-character-sheet.js",
@@ -92,5 +91,5 @@
     }
   ],
   "manifest": "https://raw.githubusercontent.com/dudeanddragons/house-rules/refs/heads/master/module.json",
-  "download": "https://github.com/dudeanddragons/house-rules/archive/refs/tags/12.25.01.11.02.zip"
+  "download": "https://github.com/dudeanddragons/house-rules/archive/refs/tags/12.25.01.22.01.zip"
 }
